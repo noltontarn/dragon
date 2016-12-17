@@ -1,5 +1,4 @@
 import arcade
-import winsound
 
 from models import World, Dragon
 
@@ -37,6 +36,8 @@ class DragonGameWindow(arcade.Window):
         self.man_texture = arcade.load_texture('images/man.png')
         self.steak_texture = arcade.load_texture('images/steak.png')
         self.fire_texture = arcade.load_texture('images/fire.png')
+        self.bgm_sound = arcade.sound.load_sound("sounds/sound2.mp3")
+        arcade.sound.play_sound(self.bgm_sound)
         
     def draw_men(self, men):
         for m in men:

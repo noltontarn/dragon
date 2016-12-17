@@ -1,5 +1,5 @@
 import arcade.key
-import winsound
+
 from random import randint
 
 GAME_RUNNING = 0
@@ -137,6 +137,9 @@ class World:
         self.hit_time = 0
         self.spawn = False
         self.damage = False
+        self.stab_sound = arcade.sound.load_sound("sounds/stab.mp3")
+        self.crunch_sound = arcade.sound.load_sound("sounds/crunch.mp3")
+        self.fire_sound = arcade.sound.load_sound("sounds/fireball.mp3")
         
     def animate(self, delta_time):
         for m in self.men:
@@ -176,6 +179,7 @@ class World:
             self.damage = False
         for m in self.men:
             if m.state == m.STATE_STEAK and (m.hit(self.dragon)):
+                arcade.sound.play_sound(self.crunch_sound)
                 m.state = m.STATE_EATEN
                 self.score += 500
                 self.count += 1
@@ -183,6 +187,7 @@ class World:
                 if self.hunger > 100:
                     self.hunger = 100
             if m.state == m.STATE_ALIVE and (m.hit(self.dragon)) and self.damage == False:
+                arcade.sound.play_sound(self.stab_sound)
                 self.score -= 250
                 self.hunger -= 5
                 self.hit_time = self.total_time
@@ -218,6 +223,7 @@ class World:
             self.dragon.switch_direction(self.dragon.DIR_LEFT)
             self.dragon.SPEED = -5
         if key == arcade.key.SPACE:
+            arcade.sound.play_sound(self.fire_sound)
             self.fire.append(Fire(self.dragon.x, self.dragon.y, 50, 50, self.dragon.direction))
 
     def on_key_release(self, key, key_modifiers):
