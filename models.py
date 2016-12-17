@@ -129,12 +129,16 @@ class World:
         for i in range(2):
             self.men.append(Man(randint(0, 1280), randint(0, 720), 100, 100, randint(0, 3)))
         self.hunger = 100
-        self.hunger_speed = 1
+        self.hunger_speed = 3
         self.number = 2
         self.score = 0
         self.count = 0
         self.total_time = 0
         self.hit_time = 0
+        self.hunger_time = 0
+        self.hungerspeed_time = 0
+        self.spawn_time = 0
+        self.spawncount_time = 0
         self.spawn = False
         self.damage = False
         self.stab_sound = arcade.sound.load_sound("sounds/stab.mp3")
@@ -154,14 +158,12 @@ class World:
         self.deplete_hunger()
 
     def deplete_hunger(self):
-        if self.total_time > 30 and self.total_time < 60:
-            self.hunger_speed = 2
-        if self.total_time > 60 and self.total_time < 90:
-            self.hunger_speed = 3
-        if self.total_time > 90:
-            self.hunger_speed = 4
-        if self.total_time %2 >0 and self.total_time %2 <0.05:
+        if self.total_time - self.hungerspeed_time > 30:
+            self.hunger_speed += 2
+            self.hungerspeed_time = self.total_time
+        if self.total_time - self.hunger_time > 2:
             self.hunger -= self.hunger_speed
+            self.hunger_time = self.total_time
             if self.hunger < 0:
                 self.hunger = 0
                 self.current_state = GAME_OVER
@@ -197,15 +199,13 @@ class World:
                     self.current_state = GAME_OVER
 
     def spawn_men(self):
-        if self.total_time > 60 and self.total_time < 90:
-            self.number = 3
+        if self.total_time - self.spawncount_time > 40:
+            self.number += 1
+            self.spawncount_time = self.total_time
             for m in self.men:
-                m.SPEED = 4
-        if self.total_time > 90:
-            self.number = 4
-            for m in self.men:
-                m.SPEED = 5
-        if self.total_time %7 > 0 and self.total_time %7 < 0.02:
+                m.SPEED += 1
+        if self.total_time - self.spawn_time > 8:
+            self.spawn_time = self.total_time
             for i in range(self.number):
                 self.men.append(Man(randint(0, 1280), randint(0, 720), 100, 100, randint(0, 3)))
             
