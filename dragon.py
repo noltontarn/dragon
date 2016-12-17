@@ -1,9 +1,13 @@
 import arcade
+import winsound
 
 from models import World, Dragon
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
+
+GAME_RUNNING = 0
+GAME_OVER = 1
 
 class ModelSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
@@ -20,19 +24,20 @@ class ModelSprite(arcade.Sprite):
         self.sync_with_model()
         super().draw()
         
-class SpaceGameWindow(arcade.Window):
+class DragonGameWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
- 
-        arcade.set_background_color(arcade.color.BLACK)
+        self.setup(width, height)
 
+    def setup(self, width, height):
+        arcade.set_background_color(arcade.color.BLACK)
         self.world = World(width, height)
         self.background_texture = arcade.load_texture('images/background.png')
         self.dragon_sprite = ModelSprite('images/dragon.png',model=self.world.dragon)
         self.man_texture = arcade.load_texture('images/man.png')
         self.steak_texture = arcade.load_texture('images/steak.png')
         self.fire_texture = arcade.load_texture('images/fire.png')
-
+        
     def draw_men(self, men):
         for m in men:
             if m.state == m.STATE_ALIVE:
@@ -77,15 +82,26 @@ class SpaceGameWindow(arcade.Window):
         arcade.draw_text(str(self.world.score),
                          self.width - 200, self.height - 30,
                          arcade.color.WHITE, 20)
+
+        if self.world.current_state == GAME_OVER:
+            output = "Game Over"
+            arcade.draw_text("Game Over", 440, 360, arcade.color.WHITE, 70)
+            arcade.draw_text("Click to restart.", 445, 250, arcade.color.WHITE, 50)
+            
     def animate(self, delta_time):
-        self.world.animate(delta_time)
+        if self.world.current_state == GAME_RUNNING:
+            self.world.animate(delta_time)
         
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
 
     def on_key_release(self, key, key_modifiers):
         self.world.on_key_release(key, key_modifiers)
-        
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        if self.world.current_state == GAME_OVER:
+            self.setup(1280, 720)
+
 if __name__ == '__main__':
-    window = SpaceGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
+    window = DragonGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     arcade.run()

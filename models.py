@@ -1,5 +1,9 @@
 import arcade.key
+import winsound
 from random import randint
+
+GAME_RUNNING = 0
+GAME_OVER = 1
 
 class Model:
     def __init__(self, world, x, y, angle):
@@ -10,7 +14,6 @@ class Model:
 
     def hit(self, other, hit_size):
         return (abs(self.x - other.x) <= hit_size) and (abs(self.y - other.y) <= hit_size)
-        
         
 class Man:
     DIR_UP = 0
@@ -118,7 +121,8 @@ class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
- 
+
+        self.current_state = GAME_RUNNING
         self.dragon = Dragon(self, 640, 360)
         self.men = []
         self.fire = []
@@ -130,9 +134,10 @@ class World:
         self.score = 0
         self.count = 0
         self.total_time = 0
+        self.hit_time = 0
         self.spawn = False
         self.damage = False
- 
+        
     def animate(self, delta_time):
         for m in self.men:
             m.animate(delta_time)
@@ -154,7 +159,9 @@ class World:
             self.hunger_speed = 4
         if self.total_time %2 >0 and self.total_time %2 <0.05:
             self.hunger -= self.hunger_speed
-            self.damage = False
+            if self.hunger < 0:
+                self.hunger = 0
+                self.current_state = GAME_OVER
 
     def hit_men(self):
         for m in self.men:
@@ -165,6 +172,8 @@ class World:
                     m.state = m.STATE_STEAK
 
     def collect_men(self):
+        if self.total_time - self.hit_time > 2:
+            self.damage = False
         for m in self.men:
             if m.state == m.STATE_STEAK and (m.hit(self.dragon)):
                 m.state = m.STATE_EATEN
@@ -176,9 +185,11 @@ class World:
             if m.state == m.STATE_ALIVE and (m.hit(self.dragon)) and self.damage == False:
                 self.score -= 250
                 self.hunger -= 5
+                self.hit_time = self.total_time
                 self.damage = True
                 if self.hunger < 0:
                     self.hunger = 0
+                    self.current_state = GAME_OVER
 
     def spawn_men(self):
         if self.total_time > 60 and self.total_time < 90:
