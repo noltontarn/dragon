@@ -151,6 +151,8 @@ class World:
         self.dragon.animate(delta_time)
         for f in self.fire:
             f.animate(delta_time)
+            if f.x > 1280 or f.x < 0 or f.y > 720 or f.y < 0:
+                self.fire.remove(f)
         self.hit_men()
         self.collect_men()
         self.spawn_men()
@@ -173,6 +175,7 @@ class World:
             for f in self.fire:
                 if (not m.is_died) and (f.hit(m)) and f.is_hit == False:
                     f.is_hit = True
+                    self.fire.remove(f)
                     m.is_died = True
                     m.state = m.STATE_STEAK
 
@@ -183,6 +186,7 @@ class World:
             if m.state == m.STATE_STEAK and (m.hit(self.dragon)):
                 arcade.sound.play_sound(self.crunch_sound)
                 m.state = m.STATE_EATEN
+                self.men.remove(m)
                 self.score += 500
                 self.count += 1
                 self.hunger += 10
