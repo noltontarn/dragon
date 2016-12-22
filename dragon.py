@@ -8,8 +8,6 @@ SCREEN_HEIGHT = 720
 GAME_RUNNING = 0
 GAME_OVER = 1
 
-HIGH_SCORE = 0
-
 class ModelSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
         self.model = kwargs.pop('model', None)
