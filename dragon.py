@@ -8,6 +8,8 @@ SCREEN_HEIGHT = 720
 GAME_RUNNING = 0
 GAME_OVER = 1
 
+HIGH_SCORE = 0
+
 class ModelSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):
         self.model = kwargs.pop('model', None)
@@ -26,6 +28,9 @@ class ModelSprite(arcade.Sprite):
 class DragonGameWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
+        self.high_score = 0
+        self.bgm_sound = arcade.sound.load_sound("sounds/sound2.mp3")
+        arcade.sound.play_sound(self.bgm_sound)
         self.setup(width, height)
 
     def setup(self, width, height):
@@ -36,8 +41,6 @@ class DragonGameWindow(arcade.Window):
         self.man_texture = arcade.load_texture('images/man.png')
         self.steak_texture = arcade.load_texture('images/steak.png')
         self.fire_texture = arcade.load_texture('images/fire.png')
-        self.bgm_sound = arcade.sound.load_sound("sounds/sound2.mp3")
-        arcade.sound.play_sound(self.bgm_sound)
         
     def draw_men(self, men):
         for m in men:
@@ -85,9 +88,12 @@ class DragonGameWindow(arcade.Window):
                          arcade.color.WHITE, 20)
 
         if self.world.current_state == GAME_OVER:
-            output = "Game Over"
             arcade.draw_text("Game Over", 440, 360, arcade.color.WHITE, 70)
             arcade.draw_text("Click to restart.", 445, 250, arcade.color.WHITE, 50)
+            if self.world.score > self.high_score:
+                self.high_score = self.world.score
+            arcade.draw_text("High Score:", 400, 150, arcade.color.WHITE, 50)
+            arcade.draw_text(str(self.high_score), 750, 150, arcade.color.WHITE, 50)
             
     def animate(self, delta_time):
         if self.world.current_state == GAME_RUNNING:

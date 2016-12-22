@@ -191,6 +191,8 @@ class World:
             if m.state == m.STATE_ALIVE and (m.hit(self.dragon)) and self.damage == False:
                 arcade.sound.play_sound(self.stab_sound)
                 self.score -= 250
+                if self.score < 0:
+                    self.score = 0
                 self.hunger -= 5
                 self.hit_time = self.total_time
                 self.damage = True
@@ -225,6 +227,10 @@ class World:
         if key == arcade.key.SPACE:
             arcade.sound.play_sound(self.fire_sound)
             self.fire.append(Fire(self.dragon.x, self.dragon.y, 50, 50, self.dragon.direction))
+            self.hunger -= 3
+            if self.hunger < 0:
+                    self.hunger = 0
+                    self.current_state = GAME_OVER
 
     def on_key_release(self, key, key_modifiers):
         if key == arcade.key.UP or key == arcade.key.DOWN or key == arcade.key.LEFT or key == arcade.key.RIGHT:
